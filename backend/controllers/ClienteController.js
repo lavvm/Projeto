@@ -1,8 +1,9 @@
     const Cliente = require('../models/Cliente')
     const bcrypt = require('bcrypt')
+    const criarClienteToken = require('../helpers/cria-cliente-token')
 
     module.exports = class ClienteController{
-        static async cadastrar(req, res){
+        static async registrar(req, res){
             const nome = req.body.nome
             const telefone = req.body.telefone
             const email = req.body.email
@@ -33,13 +34,28 @@
                 res.status(422).json({mensagem: "Confirme sua senha!"})
                 return
             }
-        }
+
+            /* Verifica se o cliente já está cadastrado */
+            const clienteExiste = await Cliente.findOne({email: email})
+
+            if (clienteExiste) {
+                res.status(422).json({mensagem: "E-mail já cadastrado"})
+            }
+
+            /* Criação da Senha */
+            const salt = await bcrypt.genSalt(12)
+            const senhaHash = await bcrypt.hash(senha,salt)
 
 
-
-
-
-
-
-
+            /*Adicionando Cliente ao bd */
+            const cliente = new Cliente({nome, email, telefone,
+                 senha: senhaHash })
+            
+            try{
+                const novoCliente = await cliente.save()
+                await criarClienteToken(novoCliente, req, res)
+            }catch(erro){
+                res.status(500).json({bmensagem: erro})
+            }
+        }/* Fim do método registrar */
     }
