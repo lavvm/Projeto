@@ -6,11 +6,11 @@ async(cliente, req, res) =>{
         id: cliente._id
     }, "mysecret")
 
-    /* Retornando o token */
+    /* Retornar token */
     res.status(200).json({
         mensagem: "Você está autenticado",
         token: token,
         clienteId: cliente._id
  })
 }
-module.exposrts = criarClienteToken
+module.exports = criarClienteToken

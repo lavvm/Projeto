@@ -1,4 +1,4 @@
-    const mongoose = require('./db/conecta')
+    const mongoose = require('../db/conecta')
     const {Schema} = mongoose
 
     const Cliente = mongoose.model('Cliente',
@@ -8,7 +8,7 @@
         senha: {type: String, required: true},
         telefone: {type: String, required: true}
     },
-    {timestamps: true}
-    ))
-
+    {timestamps: true},
+    )
+    )
     module.exports = Cliente

@@ -58,4 +58,52 @@
                 res.status(500).json({bmensagem: erro})
             }
         }/* Fim do método registrar */
+    
+
+    /* METÓDO LOGIN */
+        static async login(req, res){
+        const {email, senha} = req.body
+        if(!email){
+            res.status(422).json({
+                mensagem: "O e-mail é obrigatório"})
+            return
+            }
+        if(!senha){
+            res.status(422).json({
+                mensagem: "A senha é obrigatória"})
+            return    
+            }
+        const cliente = await Cliente.findOne({email: email})    
+
+        if(!cliente){
+            res.status(422).json({mensagem: "Usuário não encontrado!"})
+            return
+        }
+        //VERIFICA SE SENHA CONFERE COM SENHA REGISTRADA
+        const verificaSenha = await bcrypt.compare(senha,cliente.senha)
+        if(!verificaSenha){
+            res.status(422).json({mensagem: "Senha não confere"})
+            return
+        }
+        await createUserToken(cliente,req,res)
+    }/*fim do login*/
+
+        static async verificaUsuario(req,res){
+            let usuarioAtual
+
+            console.log(req.headers.autorizacao)
+
+        if (req.headers.autorizacao){
+            const token = getToken(req)
+            const decodificado = jwt.verify(token, 'my secret')
+            usuarioAtual = await Cliente.findById(decodificacao.id)
+            usuarioAtual.senha = undefined
+            //segurança aqui: esvazie o retorno da senha
+        } else{
+            usuarioAtual = null
+        }
+
+        res.status(200).send(usuarioAtual)
     }
+    
+}/*fim da classe Cliente Controller*/
